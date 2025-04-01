@@ -7,21 +7,21 @@ import javax.swing.JOptionPane;
 
 
 public class conectaDAO {
-    
-    public static Connection getConexao() {
 
+    private static final String URL = "jdbc:mysql://localhost:3306/leiloesgit";
+    private static final String USER = "root";
+    private static final String PASS = "ayla0702";
+
+    public static Connection connectDB() {
+        Connection conn = null;
         try {
-            Connection conn = DriverManager.getConnection(
-                    "jdbc:mysql://localhost/ leiloesGit ", 
-                    "root", 
-                    "ayla0702"
-            );
-            return conn;
-
-        } catch (Exception e) {
+            conn = DriverManager.getConnection(URL, USER, PASS);
+            System.out.println("Conexão estabelecida com sucesso!");
+        } catch (SQLException e) {
             System.out.println("Erro ao conectar: " + e.getMessage());
-            return null;
         }
+
+        return conn;
     }
-    
+
 }
