@@ -8,10 +8,7 @@ import javax.swing.JOptionPane;
 
 public class conectaDAO {
     
-    public Connection connectDB(){
-        Connection conn = null;
-        
-        public static Connection getConexao() {
+    public static Connection getConexao() {
 
         try {
             Connection conn = DriverManager.getConnection(
