@@ -8,72 +8,102 @@ import java.sql.SQLException;
 
 
 public class ProdutosDAO {
-    
+    private conectaDAO conexao;
     Connection conn;
-    PreparedStatement prep;
-    ResultSet resultset;
+    PreparedStatement ps;
+    ResultSet rs;
     ArrayList<ProdutosDTO> listagem = new ArrayList<>();
     
+    public ProdutosDAO(){
+        this.conexao = new conectaDAO();
+        this.conn = this.conexao.getConexao();
+    }
+    
     public void cadastrarProduto (ProdutosDTO produto){
-        conn = new conectaDAO().connectDB();
+       
         
         String sql = "INSERT INTO produto (nome, valor, status) VALUES (?, ?, ?)";
         try {
-            prep = conn.prepareStatement(sql);
-            prep.setString(1, produto.getNome());
-            prep.setInt(2, produto.getValor());
-            prep.setString(3, produto.getStatus());
+             PreparedStatement ps = this.conn.prepareStatement(sql);
+            ps.setString(1, produto.getNome());
+            ps.setInt(2, produto.getValor());
+            ps.setString(3, produto.getStatus());
             
-            prep.executeUpdate();
+            ps.executeUpdate();
             
             System.out.println("Produto cadastrado com sucesso!");
             
         } catch (SQLException e) {
             System.out.println("Erro ao cadastrar produto: " + e.getMessage());
-        }finally {
-            try {
-                if (prep != null) prep.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                System.out.println("Erro ao fechar conexão: " + e.getMessage());
-            }
         }
     }
     
     
     public ArrayList<ProdutosDTO> listarProdutos() {
-        conn = new conectaDAO().connectDB();
-        
+    
         String sql = "SELECT id, nome, valor, status FROM produto";
         
         try {
-            prep = conn.prepareStatement(sql);
-            resultset = prep.executeQuery();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery();
             
-            while (resultset.next()) {
+            while (rs.next()) {
                 ProdutosDTO produto = new ProdutosDTO();
-                produto.setId(resultset.getInt("id"));
-                produto.setNome(resultset.getString("nome"));
-                produto.setValor(resultset.getInt("valor"));
-                produto.setStatus(resultset.getString("status"));
+                produto.setId(rs.getInt("id"));
+                produto.setNome(rs.getString("nome"));
+                produto.setValor(rs.getInt("valor"));
+                produto.setStatus(rs.getString("status"));
                 
                 listagem.add(produto);
             }
             
         } catch (SQLException e) {
             System.out.println("Erro ao listar produtos: " + e.getMessage());
-        } finally {
-            try {
-                if (resultset != null) resultset.close();
-                if (prep != null) prep.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                System.out.println("Erro ao fechar conexão: " + e.getMessage());
-            }
-        }
+        } 
         
         return listagem;
     }    
- 
+    
+    public void venderProduto(int idProduto) {
+        String sql = "UPDATE produto SET status = 'Vendido' WHERE id = ?";
+        try {
+            PreparedStatement ps = this.conn.prepareStatement(sql);
+            ps.setInt(1, idProduto);
+            System.out.println("Produto vendido com sucesso!");
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao vender produto: " + e.getMessage());
+        } 
+    }
+    
+    public ArrayList<ProdutosDTO> listarProdutosVendidos() {
+        ArrayList<ProdutosDTO> produtosVendidos = new ArrayList<>();
+
+        String sql = "SELECT id, nome, valor, status FROM produto WHERE status = 'Vendido'";
+
+        try {
+            PreparedStatement ps = this.conn.prepareStatement(sql);
+            ResultSet rs= ps.executeQuery();
+
+            while (rs.next()) {
+                ProdutosDTO produto = new ProdutosDTO();
+                produto.setId(rs.getInt("id"));
+                produto.setNome(rs.getString("nome"));
+                produto.setValor(rs.getInt("valor"));
+                produto.setStatus(rs.getString("status"));
+
+                produtosVendidos.add(produto);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao listar produtos vendidos: " + e.getMessage());
+        } 
+    
+        return produtosVendidos;
+    }
+    
 }
+
+ 
+
 
